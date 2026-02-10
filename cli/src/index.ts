@@ -72,10 +72,7 @@ async function disposeTelemetryServices(): Promise<void> {
 	}
 
 	telemetryDisposed = true
-	await Promise.allSettled([
-		telemetryService.dispose(),
-		PostHogClientProvider.getInstance().dispose(),
-	])
+	await Promise.allSettled([telemetryService.dispose(), PostHogClientProvider.getInstance().dispose()])
 }
 
 async function disposeCliContext(ctx: CliContext): Promise<void> {
@@ -396,7 +393,7 @@ interface InitOptions {
  */
 async function initializeCli(options: InitOptions): Promise<CliContext> {
 	const workspacePath = options.cwd || process.cwd()
-	const { extensionContext, DATA_DIR, EXTENSION_DIR } = initializeCliContext({
+	const { extensionContext, storageContext, DATA_DIR, EXTENSION_DIR } = initializeCliContext({
 		clineDir: options.config,
 		workspaceDir: workspacePath,
 	})
@@ -438,7 +435,7 @@ async function initializeCli(options: InitOptions): Promise<CliContext> {
 		DATA_DIR,
 	)
 
-	await StateManager.initialize(extensionContext as any)
+	await StateManager.initialize(storageContext)
 	await ErrorService.initialize()
 
 	// Configure the shared Logging class to use HostProvider's output channel
